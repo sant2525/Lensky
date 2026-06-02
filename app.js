@@ -637,14 +637,136 @@ function initArStudio() {
     });
 }
 
-// Procedural texture rendering for mock head selector mesh
+// Generates a gorgeous, high-tech holographic HUD face wireframe outline when offline or on CORS blocking origins
+function createProceduralFaceTexture(modelKey) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 680;
+    const ctx = canvas.getContext('2d');
+
+    // Gradient Background
+    const grad = ctx.createRadialGradient(256, 340, 50, 256, 340, 400);
+    grad.addColorStop(0, '#16192d');
+    grad.addColorStop(1, '#050608');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 680);
+
+    // Draw grid lines for high-tech HUD styling
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.08)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 512; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, 680);
+        ctx.stroke();
+    }
+    for (let j = 0; j < 680; j += 40) {
+        ctx.beginPath();
+        ctx.moveTo(0, j);
+        ctx.lineTo(512, j);
+        ctx.stroke();
+    }
+
+    // Stylized Face Outline (Aesthetic minimalist vector)
+    ctx.strokeStyle = modelKey === 'model2' ? '#d4af37' : '#00f2fe';
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 15;
+    ctx.lineWidth = 3;
+    
+    // Draw stylized head silhouette
+    ctx.beginPath();
+    ctx.arc(256, 260, 110, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Jaw/chin shape
+    ctx.beginPath();
+    ctx.moveTo(146, 260);
+    ctx.quadraticCurveTo(146, 420, 256, 460);
+    ctx.quadraticCurveTo(366, 420, 366, 260);
+    ctx.stroke();
+
+    // Neck
+    ctx.beginPath();
+    ctx.moveTo(196, 430);
+    ctx.lineTo(196, 520);
+    ctx.moveTo(316, 430);
+    ctx.lineTo(316, 520);
+    ctx.stroke();
+
+    // Draw stylized high-tech scanning indicators (eye nodes and nose bridge)
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    
+    // Left eye node
+    ctx.beginPath();
+    ctx.arc(206, 250, 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Right eye node
+    ctx.beginPath();
+    ctx.arc(306, 250, 6, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+    
+    // Nose bridge node (Landmark 168 target)
+    ctx.fillStyle = '#ff3b56';
+    ctx.strokeStyle = '#ff3b56';
+    ctx.shadowColor = '#ff3b56';
+    ctx.beginPath();
+    ctx.arc(256, 270, 5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.stroke();
+
+    // Drawing target crosshair circles around nose bridge
+    ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(256, 270, 25, 0, Math.PI*2);
+    ctx.stroke();
+
+    // HUD Text
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#9aa0b9';
+    ctx.font = 'bold 12px "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText("VR CALIBRATION HUD V2.1", 256, 80);
+    
+    ctx.fillStyle = modelKey === 'model2' ? '#d4af37' : '#00f2fe';
+    ctx.fillText("FACIAL PROFILE ENGAGED: " + (modelKey === 'model1' ? "FEMALE_A" : modelKey === 'model2' ? "MALE_A" : "MALE_B"), 256, 580);
+    
+    ctx.fillStyle = '#5e647e';
+    ctx.font = '10px "Inter", sans-serif';
+    ctx.fillText("LATENCY: 0.12ms | TRACKING SENSORS: OK", 256, 610);
+
+    return new THREE.CanvasTexture(canvas);
+}
+
+// Procedural texture rendering for mock head selector mesh (resilient to CORS)
 function setupPortraitBackgroundMesh() {
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin('anonymous');
     
-    // Create portrait mesh positioned exactly behind the glasses
     const geom = new THREE.PlaneGeometry(3.6, 4.8);
-    arPortraitTexture = loader.load(faceModels[arState.activePortrait]);
+    
+    // Load remote image with CORS safety fallback
+    arPortraitTexture = loader.load(
+        faceModels[arState.activePortrait],
+        // onSuccess
+        () => {
+            arPortraitMesh.material.map = arPortraitTexture;
+            arPortraitMesh.material.needsUpdate = true;
+        },
+        // onProgress
+        undefined,
+        // onError (CORS or network error fallback)
+        () => {
+            console.warn("CORS or Network error loading remote portrait face model. Switching to interactive vector HUD texture.");
+            arPortraitTexture = createProceduralFaceTexture(arState.activePortrait);
+            arPortraitMesh.material.map = arPortraitTexture;
+            arPortraitMesh.material.needsUpdate = true;
+        }
+    );
     
     const mat = new THREE.MeshBasicMaterial({
         map: arPortraitTexture,
@@ -735,7 +857,7 @@ function stopCameraStream() {
     ui.trackingStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Camera Stream Off. Using Static Model Face.`;
 }
 
-// Swaps preloaded portrait face template background textures
+// Swaps preloaded portrait face template background textures (resilient to CORS)
 function selectModelFace(modelKey) {
     arState.activePortrait = modelKey;
     
@@ -748,9 +870,24 @@ function selectModelFace(modelKey) {
     if (arPortraitMesh) {
         const loader = new THREE.TextureLoader();
         loader.setCrossOrigin('anonymous');
-        arPortraitTexture = loader.load(faceModels[modelKey]);
-        arPortraitMesh.material.map = arPortraitTexture;
-        arPortraitMesh.material.needsUpdate = true;
+        
+        arPortraitTexture = loader.load(
+            faceModels[modelKey],
+            // onSuccess
+            () => {
+                arPortraitMesh.material.map = arPortraitTexture;
+                arPortraitMesh.material.needsUpdate = true;
+            },
+            // onProgress
+            undefined,
+            // onError
+            () => {
+                console.warn("CORS or Network error loading swapped face model. Using vector HUD.");
+                arPortraitTexture = createProceduralFaceTexture(modelKey);
+                arPortraitMesh.material.map = arPortraitTexture;
+                arPortraitMesh.material.needsUpdate = true;
+            }
+        );
     }
 }
 
