@@ -19,11 +19,18 @@ const arState = {
     posZ: 0.0,
     rotX: 0.0,
     
-    // Camera state
+    // Camera & Autopilot states
     cameraActive: false,
     cameraStream: null,
     activePortrait: 'model1',
-    guidesEnabled: true
+    guidesEnabled: true,
+    
+    faceMeshLoading: false,
+    faceMeshReady: false,
+    autoTrackingActive: false,
+    faceMeshDetector: null,
+    cameraTracker: null,
+    landmarksData: null
 };
 
 // UI Elements caching
@@ -608,20 +615,78 @@ function initArStudio() {
         requestAnimationFrame(renderStudio);
 
         if (arGlasses) {
-            // Adjust coordinates based on webcam vs portrait setup
-            const basePosY = arState.cameraActive ? 0.05 : 0.08; // Lowered from 0.45 to 0.08 to sit exactly on the face bridge
-            const basePosZ = arState.cameraActive ? 1.2 : -1.1;  // Align glasses flush on the 3D portrait depth plane
-            const baseScale = arState.cameraActive ? 0.8 : 0.76;  // Scaled down from 1.45/1.05 to fit the face proportions snugly
-            
-            // Apply Calibration variables combined with dynamic interactive rotations
-            arGlasses.scale.set(arState.scale * baseScale, arState.scale * baseScale, arState.scale * baseScale);
-            
-            arGlasses.position.y = basePosY + arState.posY;
-            arGlasses.position.z = basePosZ + arState.posZ;
-            
-            // Smoothly lerp towards target mouse rotation matrix for parallax
-            arGlasses.rotation.y += (arRotY - arGlasses.rotation.y) * 0.12;
-            arGlasses.rotation.x += ((arRotX + arState.rotX) - arGlasses.rotation.x) * 0.12;
+            if (arState.cameraActive && arState.autoTrackingActive && arState.landmarksData) {
+                const landmarks = arState.landmarksData;
+                
+                // Fetch key landmarks (MediaPipe index indices)
+                const nose = landmarks[168];   // Nose bridge midpoint
+                const eyeL = landmarks[33];    // Left eye outer corner
+                const eyeR = landmarks[263];   // Right eye outer corner
+                const cheekL = landmarks[234]; // Left cheek edge
+                const cheekR = landmarks[454]; // Right cheek edge
+                
+                // 3D Translation (map normalized 0-1 canvas space to WebGL units)
+                const targetX = -(nose.x - 0.5) * 3.3; // Flip X because camera is mirrored
+                const targetY = -(nose.y - 0.5) * 4.4 + 0.05;
+                
+                // Real-time automatic scale adjustment based on pupil distance depth
+                const eyeDist = Math.hypot(eyeR.x - eyeL.x, eyeR.y - eyeL.y);
+                const targetScale = (eyeDist / 0.20) * 0.78 * arState.scale;
+                
+                // Dynamic depth (Z position) closer/further matching eye-distance bounds
+                const targetZ = 1.2 + (eyeDist - 0.2) * 4.0 + arState.posZ;
+                
+                // Autopilot Rotations (Yaw, Pitch, Roll)
+                // Z-Rotation (Roll): Angle between the eye corners
+                const targetRoll = -Math.atan2(eyeR.y - eyeL.y, eyeR.x - eyeL.x);
+                // Y-Rotation (Yaw): Head turn symmetry calculated from nose-to-cheeks ratios
+                const distL = Math.hypot(nose.x - cheekL.x, nose.y - cheekL.y);
+                const distR = Math.hypot(cheekR.x - nose.x, cheekR.y - nose.y);
+                const targetYaw = ((distL - distR) / (distL + distR)) * 1.5;
+                // X-Rotation (Pitch): Tilt calculated from depth delta between nose and eye plane
+                const targetPitch = (nose.z - (eyeL.z + eyeR.z) / 2) * 12.0 + arState.rotX;
+                
+                // Low-pass filter (Linear Interpolation / LERP) to ensure buttery smooth tracker motion
+                arGlasses.position.x += (targetX - arGlasses.position.x) * 0.25;
+                arGlasses.position.y += (targetY + arState.posY - arGlasses.position.y) * 0.25;
+                arGlasses.position.z += (targetZ - arGlasses.position.z) * 0.25;
+                
+                arGlasses.scale.set(
+                    arGlasses.scale.x + (targetScale - arGlasses.scale.x) * 0.2,
+                    arGlasses.scale.y + (targetScale - arGlasses.scale.y) * 0.2,
+                    arGlasses.scale.z + (targetScale - arGlasses.scale.z) * 0.2
+                );
+                
+                arGlasses.rotation.z += (targetRoll - arGlasses.rotation.z) * 0.2;
+                arGlasses.rotation.y += (targetYaw - arGlasses.rotation.y) * 0.2;
+                arGlasses.rotation.x += (targetPitch - arGlasses.rotation.x) * 0.2;
+                
+            } else {
+                // Fallback Mode: Custom Interactive Cursor Parallax and Static calibration settings
+                const basePosY = 0.08; 
+                const basePosZ = -1.1;  
+                const baseScale = 0.76;  
+                
+                const targetX = 0;
+                const targetY = basePosY + arState.posY;
+                const targetZ = basePosZ + arState.posZ;
+                const targetScaleVal = arState.scale * baseScale;
+                
+                // Smooth glide transitions
+                arGlasses.position.x += (targetX - arGlasses.position.x) * 0.15;
+                arGlasses.position.y += (targetY - arGlasses.position.y) * 0.15;
+                arGlasses.position.z += (targetZ - arGlasses.position.z) * 0.15;
+                
+                arGlasses.scale.set(
+                    arGlasses.scale.x + (targetScaleVal - arGlasses.scale.x) * 0.15,
+                    arGlasses.scale.y + (targetScaleVal - arGlasses.scale.y) * 0.15,
+                    arGlasses.scale.z + (targetScaleVal - arGlasses.scale.z) * 0.15
+                );
+                
+                arGlasses.rotation.y += (arRotY - arGlasses.rotation.y) * 0.12;
+                arGlasses.rotation.x += ((arRotX + arState.rotX) - arGlasses.rotation.x) * 0.12;
+                arGlasses.rotation.z += (0 - arGlasses.rotation.z) * 0.15;
+            }
         }
 
         arRenderer.render(arScene, arCamera);
@@ -827,8 +892,11 @@ function startCameraStream() {
             
             if (arPortraitMesh) arPortraitMesh.visible = false; // Hide mock static head
             
-            ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-cyan)"></i> Live Webcam Active. Auto Calibration Complete.`;
+            ui.trackingStatus.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading 3D Face Tracker models...`;
             if (arState.guidesEnabled) ui.calibrationGuide.classList.add('active');
+            
+            // Initialize Google MediaPipe client-side Face Mesh tracker
+            initializeFaceMeshTracker();
         })
         .catch(err => {
             console.error("Camera access error: ", err);
@@ -840,8 +908,83 @@ function startCameraStream() {
     }
 }
 
+function initializeFaceMeshTracker() {
+    if (arState.faceMeshDetector) {
+        ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Connecting Face Sensors...`;
+        startCameraProcessingLoop();
+        return;
+    }
+    
+    try {
+        arState.faceMeshDetector = new FaceMesh({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        });
+        
+        arState.faceMeshDetector.setOptions({
+            maxNumFaces: 1,
+            refineLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        
+        arState.faceMeshDetector.onResults((results) => {
+            onFaceTrackingResults(results);
+        });
+        
+        startCameraProcessingLoop();
+    } catch(e) {
+        console.error("Error creating FaceMesh:", e);
+        ui.trackingStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Tracker Failed to load. Using manual calibration.`;
+    }
+}
+
+function startCameraProcessingLoop() {
+    if (!arState.cameraTracker && window.Camera) {
+        arState.cameraTracker = new Camera(ui.webcam, {
+            onFrame: async () => {
+                if (arState.cameraActive && arState.faceMeshDetector) {
+                    try {
+                        await arState.faceMeshDetector.send({ image: ui.webcam });
+                    } catch(err) {
+                        // Suppress frame processing warnings
+                    }
+                }
+            },
+            width: 640,
+            height: 480
+        });
+        arState.cameraTracker.start()
+            .then(() => {
+                ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-cyan)"></i> Live Webcam Active. Calibration locked.`;
+            })
+            .catch(err => {
+                console.error("Camera tracker start error:", err);
+            });
+    } else if (arState.cameraTracker) {
+        ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-cyan)"></i> Live Webcam Active. Calibration locked.`;
+    }
+}
+
+function onFaceTrackingResults(results) {
+    if (!arState.cameraActive) return;
+
+    if (results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+        arState.autoTrackingActive = true;
+        arState.landmarksData = results.multiFaceLandmarks[0];
+        
+        ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--accent-cyan)"></i> Autopilot Face Lock Engaged.`;
+        ui.calibrationGuide.classList.remove('active'); // Hide calibration guides once face is fully locked!
+    } else {
+        arState.autoTrackingActive = false;
+        ui.trackingStatus.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Align your face within the camera guides...`;
+        if (arState.guidesEnabled) ui.calibrationGuide.classList.add('active');
+    }
+}
+
 function stopCameraStream() {
     arState.cameraActive = false;
+    arState.autoTrackingActive = false;
+    arState.landmarksData = null;
     ui.cameraBtn.classList.remove('active');
     
     if (arState.cameraStream) {
