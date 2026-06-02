@@ -608,14 +608,16 @@ function initArStudio() {
         requestAnimationFrame(renderStudio);
 
         if (arGlasses) {
-            // Apply Calibration variables combined with dynamic interactive rotations
-            arGlasses.scale.set(arState.scale * 0.9, arState.scale * 0.9, arState.scale * 0.9);
-            
             // Adjust coordinates based on webcam vs portrait setup
             const basePosY = arState.cameraActive ? 0.05 : 0.45; // Face coordinates align differently
+            const basePosZ = arState.cameraActive ? 1.2 : -1.1;  // Align glasses flush on the 3D portrait depth plane
+            const baseScale = arState.cameraActive ? 1.05 : 1.45; // Compensate for depth perspective scaling
+            
+            // Apply Calibration variables combined with dynamic interactive rotations
+            arGlasses.scale.set(arState.scale * baseScale, arState.scale * baseScale, arState.scale * baseScale);
             
             arGlasses.position.y = basePosY + arState.posY;
-            arGlasses.position.z = 0.5 + arState.posZ;
+            arGlasses.position.z = basePosZ + arState.posZ;
             
             // Smoothly lerp towards target mouse rotation matrix for parallax
             arGlasses.rotation.y += (arRotY - arGlasses.rotation.y) * 0.12;
