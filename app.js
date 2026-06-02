@@ -609,7 +609,7 @@ function initArStudio() {
 
         if (arGlasses) {
             // Adjust coordinates based on webcam vs portrait setup
-            const basePosY = arState.cameraActive ? 0.05 : 0.45; // Face coordinates align differently
+            const basePosY = arState.cameraActive ? 0.05 : 0.08; // Lowered from 0.45 to 0.08 to sit exactly on the face bridge
             const basePosZ = arState.cameraActive ? 1.2 : -1.1;  // Align glasses flush on the 3D portrait depth plane
             const baseScale = arState.cameraActive ? 1.05 : 1.45; // Compensate for depth perspective scaling
             
@@ -669,7 +669,7 @@ function createProceduralFaceTexture(modelKey) {
         ctx.stroke();
     }
 
-    // Stylized Face Outline (Aesthetic minimalist vector)
+    // Stylized Face Outline (Aesthetic minimalist vector - shifted by +58px down to center face bridge)
     ctx.strokeStyle = modelKey === 'model2' ? '#d4af37' : '#00f2fe';
     ctx.shadowColor = ctx.strokeStyle;
     ctx.shadowBlur = 15;
@@ -677,22 +677,22 @@ function createProceduralFaceTexture(modelKey) {
     
     // Draw stylized head silhouette
     ctx.beginPath();
-    ctx.arc(256, 260, 110, 0, Math.PI * 2);
+    ctx.arc(256, 318, 110, 0, Math.PI * 2);
     ctx.stroke();
 
     // Jaw/chin shape
     ctx.beginPath();
-    ctx.moveTo(146, 260);
-    ctx.quadraticCurveTo(146, 420, 256, 460);
-    ctx.quadraticCurveTo(366, 420, 366, 260);
+    ctx.moveTo(146, 318);
+    ctx.quadraticCurveTo(146, 478, 256, 518);
+    ctx.quadraticCurveTo(366, 478, 366, 318);
     ctx.stroke();
 
     // Neck
     ctx.beginPath();
-    ctx.moveTo(196, 430);
-    ctx.lineTo(196, 520);
-    ctx.moveTo(316, 430);
-    ctx.lineTo(316, 520);
+    ctx.moveTo(196, 488);
+    ctx.lineTo(196, 578);
+    ctx.moveTo(316, 488);
+    ctx.lineTo(316, 578);
     ctx.stroke();
 
     // Draw stylized high-tech scanning indicators (eye nodes and nose bridge)
@@ -701,13 +701,13 @@ function createProceduralFaceTexture(modelKey) {
     
     // Left eye node
     ctx.beginPath();
-    ctx.arc(206, 250, 6, 0, Math.PI*2);
+    ctx.arc(206, 308, 6, 0, Math.PI*2);
     ctx.fill();
     ctx.stroke();
     
     // Right eye node
     ctx.beginPath();
-    ctx.arc(306, 250, 6, 0, Math.PI*2);
+    ctx.arc(306, 308, 6, 0, Math.PI*2);
     ctx.fill();
     ctx.stroke();
     
@@ -716,7 +716,7 @@ function createProceduralFaceTexture(modelKey) {
     ctx.strokeStyle = '#ff3b56';
     ctx.shadowColor = '#ff3b56';
     ctx.beginPath();
-    ctx.arc(256, 270, 5, 0, Math.PI*2);
+    ctx.arc(256, 328, 5, 0, Math.PI*2);
     ctx.fill();
     ctx.stroke();
 
@@ -724,7 +724,7 @@ function createProceduralFaceTexture(modelKey) {
     ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.arc(256, 270, 25, 0, Math.PI*2);
+    ctx.arc(256, 328, 25, 0, Math.PI*2);
     ctx.stroke();
 
     // HUD Text
