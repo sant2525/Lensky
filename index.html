@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lensky | Premium 3D VR Spectacles Try-On Studio</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Experience Lensky's premium 3D VR spectacles virtual try-on. Explore our luxury collection of eyewear and fit them instantly using our state-of-the-art camera tracker.">
+    <meta name="keywords" content="virtual try-on, 3d glasses, vr spectacles, augmented reality eyewear, lensky, premium sunglasses">
+    <meta name="author" content="Lensky PVT LTD">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Three.js and MediaPipe CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Premium Header -->
+    <header class="app-header">
+        <div class="header-container">
+            <a href="#" class="logo">
+                <span class="logo-icon"><i class="fa-solid fa-eye-low-vision"></i></span>
+                <span class="logo-text">LENSKY</span>
+            </a>
+            
+            <nav class="nav-links">
+                <a href="#collections" class="nav-link">Collections</a>
+                <a href="#technology" class="nav-link">AR Tech</a>
+                <a href="#" class="nav-link active" onclick="openTryOnModal(event, 'aviator')">Try-On Studio</a>
+            </nav>
+            
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-sm" id="theme-toggle">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'aviator')">
+                    Launch Studio
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-bg-glow"></div>
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <span class="badge">Virtual Reality Eyewear</span>
+                    <h1 class="hero-title">The Future of Eyewear. <br><span class="gradient-text">Virtually Perfect.</span></h1>
+                    <p class="hero-subtitle">Step into the Lensky VR Studio. Fit, customize, and purchase luxury spectacles rendered in photorealistic 3D, mapped instantly to your facial structure using real-time spatial calculations.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-gradient btn-lg" onclick="openTryOnModal(event, 'aviator')">
+                            <i class="fa-solid fa-camera-retro"></i> Enter VR Try-On
+                        </button>
+                        <a href="#collections" class="btn btn-outline btn-lg">Explore Collections</a>
+                    </div>
+                    
+                    <!-- Stats Grid -->
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">4K+</span>
+                            <span class="stat-label">3D Vertices / Mesh</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">0ms</span>
+                            <span class="stat-label">Latency Tracking</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Client-Side Privacy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="hero-visual">
+                    <div class="floating-card-wrapper">
+                        <!-- Glassmorphism Floating Showcase Card -->
+                        <div class="glass-card floating-card">
+                            <div class="glass-card-header">
+                                <span class="card-status"><span class="pulse-dot"></span> Interactive 3D Model</span>
+                                <div class="card-controls">
+                                    <span class="circle-btn red"></span>
+                                    <span class="circle-btn yellow"></span>
+                                    <span class="circle-btn green"></span>
+                                </div>
+                            </div>
+                            <div class="showcase-3d-container" id="hero-3d-container">
+                                <!-- Three.js will load static rotating glasses model here -->
+                            </div>
+                            <div class="glass-card-body">
+                                <h3>Aurelia Aviator 18K</h3>
+                                <p>Champagne Gold frame with Ocean Blue refractive lenses.</p>
+                                <div class="card-footer">
+                                    <span class="price">$289.00</span>
+                                    <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'aviator')">Try-On <i class="fa-solid fa-chevron-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Catalog Section -->
+        <section class="catalog-section" id="collections">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Exquisite Designs</span>
+                    <h2 class="section-title">The Lensky Signature Collection</h2>
+                    <p class="section-subtitle">Crafted from premium grade materials including aero-grade titanium, gold alloys, and classic Italian acetate.</p>
+                </div>
+                
+                <div class="product-grid">
+                    <!-- Product 1 -->
+                    <div class="product-card" data-style="aviator">
+                        <div class="product-image-container">
+                            <div class="product-glow"></div>
+                            <!-- A premium representation placeholder -->
+                            <div class="product-render-box" id="render-aviator"></div>
+                            <div class="product-badge premium">Titanium</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <span class="product-category">Aviator</span>
+                                <div class="rating">
+                                    <i class="fa-solid fa-star"></i> 4.9
+                                </div>
+                            </div>
+                            <h3 class="product-title">Aurelia Aviator</h3>
+                            <p class="product-desc">Ultra-light aerospace titanium frame plated in 18K Champagne Gold with premium blue lenses.</p>
+                            <div class="product-price-row">
+                                <span class="product-price">$289.00</span>
+                                <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'aviator')">
+                                    <i class="fa-solid fa-camera"></i> Virtual Try-On
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="product-card" data-style="wayfarer">
+                        <div class="product-image-container">
+                            <div class="product-glow"></div>
+                            <div class="product-render-box" id="render-wayfarer"></div>
+                            <div class="product-badge acetate">Acetate</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <span class="product-category">Classic</span>
+                                <div class="rating">
+                                    <i class="fa-solid fa-star"></i> 4.8
+                                </div>
+                            </div>
+                            <h3 class="product-title">Carbon Noir Wayfarer</h3>
+                            <p class="product-desc">Thick-cut Italian black acetate frame. Hand-polished to a glass-like sheen with dark obsidian lenses.</p>
+                            <div class="product-price-row">
+                                <span class="product-price">$245.00</span>
+                                <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'wayfarer')">
+                                    <i class="fa-solid fa-camera"></i> Virtual Try-On
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 3 -->
+                    <div class="product-card" data-style="round">
+                        <div class="product-image-container">
+                            <div class="product-glow"></div>
+                            <div class="product-render-box" id="render-round"></div>
+                            <div class="product-badge retro">Retro Steel</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <span class="product-category">Vintage</span>
+                                <div class="rating">
+                                    <i class="fa-solid fa-star"></i> 4.7
+                                </div>
+                            </div>
+                            <h3 class="product-title">Celeste Round</h3>
+                            <p class="product-desc">Fine rose-gold stainless steel circular frames. Elegant, ultra-comfortable, featuring soft sunset gradient lenses.</p>
+                            <div class="product-price-row">
+                                <span class="product-price">$210.00</span>
+                                <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'round')">
+                                    <i class="fa-solid fa-camera"></i> Virtual Try-On
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 4 -->
+                    <div class="product-card" data-style="cateye">
+                        <div class="product-image-container">
+                            <div class="product-glow"></div>
+                            <div class="product-render-box" id="render-cateye"></div>
+                            <div class="product-badge modern">Chic</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="product-meta">
+                                <span class="product-category">Modern</span>
+                                <div class="rating">
+                                    <i class="fa-solid fa-star"></i> 4.9
+                                </div>
+                            </div>
+                            <h3 class="product-title">Valkyrie Cat-Eye</h3>
+                            <p class="product-desc">Flamboyant winged temples carved from crystal amethyst shell. Stunning modern curves with blue-light coating.</p>
+                            <div class="product-price-row">
+                                <span class="product-price">$265.00</span>
+                                <button class="btn btn-gradient btn-sm" onclick="openTryOnModal(event, 'cateye')">
+                                    <i class="fa-solid fa-camera"></i> Virtual Try-On
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <section class="technology-section" id="technology">
+            <div class="container tech-container">
+                <div class="tech-visual">
+                    <div class="tech-graphic">
+                        <div class="scanner-circle">
+                            <div class="scanner-line"></div>
+                            <i class="fa-solid fa-face-smile scanner-face"></i>
+                        </div>
+                        <div class="point point-1"><span class="point-tag">Bridge (Landmark 168)</span></div>
+                        <div class="point point-2"><span class="point-tag">Left Eye (Landmark 33)</span></div>
+                        <div class="point point-3"><span class="point-tag">Right Eye (Landmark 263)</span></div>
+                    </div>
+                </div>
+                <div class="tech-content">
+                    <span class="section-tag">How It Works</span>
+                    <h2 class="section-title">High-Fidelity Real-Time AR Tracking</h2>
+                    <p class="tech-desc">Our Virtual Try-On engine does not simply paint static elements onto a 2D image. It calculates a complete 3D spatial orientation of your face structure in real time.</p>
+                    
+                    <ul class="tech-list">
+                        <li>
+                            <div class="list-icon"><i class="fa-solid fa-cube"></i></div>
+                            <div class="list-text">
+                                <strong>Nose Bridge Lock (Landmark 168):</strong> Places the 3D model with precision at the anatomical resting point.
+                            </div>
+                        </li>
+                        <li>
+                            <div class="list-icon"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></div>
+                            <div class="list-text">
+                                <strong>Dynamic Pupil Scaling:</strong> Measures outer-eye separation to perfectly scale the temple arms and frame size based on proximity to camera.
+                            </div>
+                        </li>
+                        <li>
+                            <div class="list-icon"><i class="fa-solid fa-arrows-spin"></i></div>
+                            <div class="list-text">
+                                <strong>Euler Rotational Matrix:</strong> Calculates Roll, Yaw, and Pitch angles instantly, maintaining tracking lock even as you tilt or turn your head.
+                            </div>
+                        </li>
+                        <li>
+                            <div class="list-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div class="list-text">
+                                <strong>Refractive Physics Shaders:</strong> Simulates glass index of refraction (1.52) to authentically refract background lighting.
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Virtual Try-On Studio (FullScreen Modal) -->
+    <div class="tryon-modal" id="tryon-modal">
+        <div class="modal-backdrop" onclick="closeTryOnModal()"></div>
+        
+        <div class="modal-window glass-card">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-title-area">
+                    <span class="live-tag"><span class="pulse-dot"></span> LIVE AR STUDIO</span>
+                    <h2 id="modal-spectacles-title">Aurelia Aviator Try-On</h2>
+                </div>
+                <button class="close-btn" onclick="closeTryOnModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Modal Body (Two Column Layout) -->
+            <div class="modal-body">
+                <!-- Left Column: Camera Viewport & Overlay Canvas -->
+                <div class="viewport-col">
+                    <div class="viewport-container">
+                        <!-- Camera Stream elements -->
+                        <video id="webcam-feed" autoplay playsinline muted></video>
+                        
+                        <!-- Transparent 3D Canvas Overlay -->
+                        <canvas id="ar-canvas"></canvas>
+                        
+                        <!-- Interface Overlays inside camera -->
+                        <div class="viewport-overlay-ui">
+                            <!-- Calibration Guide Overlay -->
+                            <div class="calibration-guide" id="calibration-guide">
+                                <div class="guide-circle"></div>
+                                <p>Center your face in the circle for best alignment</p>
+                            </div>
+                            
+                            <!-- Camera Controls -->
+                            <div class="viewport-controls">
+                                <button class="vp-btn" id="camera-toggle-btn" title="Toggle Webcam">
+                                    <i class="fa-solid fa-video"></i>
+                                </button>
+                                <button class="vp-btn" id="snapshot-btn" title="Take a Photo">
+                                    <i class="fa-solid fa-camera"></i>
+                                </button>
+                                <button class="vp-btn" id="guide-toggle-btn" title="Toggle Overlay Guides">
+                                    <i class="fa-solid fa-circle-nodes"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Tracking Status toast -->
+                            <div class="tracking-status-toast" id="tracking-status">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Camera Stream Off. Using Static Model Face.
+                            </div>
+                        </div>
+
+                        <!-- Face Portrait Selection (When Camera is disabled) -->
+                        <div class="portrait-selection-container" id="portrait-selector">
+                            <span class="selector-title">Select a Portrait Model or Enable Camera:</span>
+                            <div class="portrait-list">
+                                <button class="portrait-btn active" data-img="model1" onclick="selectModelFace('model1')">
+                                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200" alt="Model 1">
+                                    <span>Elena (Female)</span>
+                                </button>
+                                <button class="portrait-btn" data-img="model2" onclick="selectModelFace('model2')">
+                                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200" alt="Model 2">
+                                    <span>Lucas (Male)</span>
+                                </button>
+                                <button class="portrait-btn" data-img="model3" onclick="selectModelFace('model3')">
+                                    <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200" alt="Model 3">
+                                    <span>Marcus (Male)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Column: Live Spectacles Configurator -->
+                <div class="config-col">
+                    <!-- Section 1: Frame Styles -->
+                    <div class="config-section">
+                        <span class="config-section-tag">Step 1</span>
+                        <h3 class="config-section-title">Choose Frame Architecture</h3>
+                        <div class="style-selector-grid">
+                            <button class="style-card active" data-style="aviator" onclick="changeSpectaclesStyle('aviator')">
+                                <span class="style-icon"><i class="fa-solid fa-signature"></i></span>
+                                <span class="style-name">Aviator</span>
+                            </button>
+                            <button class="style-card" data-style="wayfarer" onclick="changeSpectaclesStyle('wayfarer')">
+                                <span class="style-icon"><i class="fa-solid fa-square-full"></i></span>
+                                <span class="style-name">Wayfarer</span>
+                            </button>
+                            <button class="style-card" data-style="round" onclick="changeSpectaclesStyle('round')">
+                                <span class="style-icon"><i class="fa-solid fa-circle"></i></span>
+                                <span class="style-name">Round Retro</span>
+                            </button>
+                            <button class="style-card" data-style="cateye" onclick="changeSpectaclesStyle('cateye')">
+                                <span class="style-icon"><i class="fa-solid fa-cat"></i></span>
+                                <span class="style-name">Cat-Eye</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Material & Color Customizer -->
+                    <div class="config-section">
+                        <span class="config-section-tag">Step 2</span>
+                        <h3 class="config-section-title">Frame Material & Color</h3>
+                        <div class="color-options-row" id="frame-color-row">
+                            <!-- Populated by JS based on model, or preset styles -->
+                            <button class="color-swatch active" data-color="#d4af37" style="background: linear-gradient(135deg, #fce085, #d4af37);" onclick="changeFrameColor('#d4af37', 'Polished Gold')"></button>
+                            <button class="color-swatch" data-color="#111111" style="background: #111111;" onclick="changeFrameColor('#111111', 'Obsidian Black')"></button>
+                            <button class="color-swatch" data-color="#c0c0c0" style="background: linear-gradient(135deg, #ffffff, #a8a8a8);" onclick="changeFrameColor('#c0c0c0', 'Sleek Silver')"></button>
+                            <button class="color-swatch" data-color="#b76e79" style="background: linear-gradient(135deg, #f3a8b4, #b76e79);" onclick="changeFrameColor('#b76e79', 'Rose Gold')"></button>
+                            <button class="color-swatch" data-color="#6f4e37" style="background: radial-gradient(circle, #e5a93b 20%, #301f11 80%);" onclick="changeFrameColor('#6f4e37', 'Tortoise')"></button>
+                        </div>
+                        <p class="config-label-detail">Selected: <strong id="selected-frame-label">Polished Gold</strong></p>
+                    </div>
+
+                    <!-- Section 3: Lens Shader Config -->
+                    <div class="config-section">
+                        <span class="config-section-tag">Step 3</span>
+                        <h3 class="config-section-title">Lens Color & Physics</h3>
+                        <div class="color-options-row" id="lens-color-row">
+                            <button class="color-swatch active" data-lens-color="#4ea8de" style="background: rgba(78, 168, 222, 0.7); box-shadow: inset 0 0 10px rgba(255,255,255,0.4);" onclick="changeLensColor('#4ea8de', 'Ocean Blue Refractive', 0.85, 1.52)"></button>
+                            <button class="color-swatch" data-lens-color="#f77f00" style="background: rgba(247, 127, 0, 0.7);" onclick="changeLensColor('#f77f00', 'Sunset Amber', 0.8, 1.45)"></button>
+                            <button class="color-swatch" data-lens-color="#111111" style="background: rgba(17, 17, 17, 0.9);" onclick="changeLensColor('#111111', 'Dark Tint Sunglasses', 0.92, 1.3)"></button>
+                            <button class="color-swatch" data-lens-color="#a5a5a5" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3);" onclick="changeLensColor('#a5a5a5', 'Clear Blue Light Filter', 0.25, 1.6)"></button>
+                        </div>
+                        <p class="config-label-detail">Selected: <strong id="selected-lens-label">Ocean Blue Refractive</strong></p>
+                        
+                        <!-- Real-time Sliders for Calibration / Customizing -->
+                        <div class="slider-group">
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Lens Refraction (IOR)</span>
+                                    <span id="ior-value">1.52</span>
+                                </div>
+                                <input type="range" min="1.0" max="2.0" step="0.05" value="1.52" class="config-slider" id="slider-ior" oninput="adjustLensProperty('ior', this.value)">
+                            </div>
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Lens Opacity</span>
+                                    <span id="opacity-value">85%</span>
+                                </div>
+                                <input type="range" min="10" max="100" step="5" value="85" class="config-slider" id="slider-opacity" oninput="adjustLensProperty('opacity', this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: VR Manual Spatial Calibration -->
+                    <div class="config-section">
+                        <span class="config-section-tag">Step 4</span>
+                        <div class="section-title-with-info">
+                            <h3 class="config-section-title">Spatial Calibration Studio</h3>
+                            <button class="reset-cal-btn" onclick="resetCalibration()"><i class="fa-solid fa-arrows-rotate"></i> Reset</button>
+                        </div>
+                        <p class="config-info-text">Fine-tune the glasses model precisely to your unique facial profile or webcam aspect ratio.</p>
+                        
+                        <div class="slider-group">
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Scale (Size)</span>
+                                    <span id="scale-value">1.0x</span>
+                                </div>
+                                <input type="range" min="0.5" max="1.8" step="0.05" value="1.0" class="config-slider" id="cal-scale" oninput="adjustSpectaclesCalibration('scale', this.value)">
+                            </div>
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Depth Position (Z-axis)</span>
+                                    <span id="posz-value">0.0px</span>
+                                </div>
+                                <input type="range" min="-150" max="150" step="5" value="0" class="config-slider" id="cal-posz" oninput="adjustSpectaclesCalibration('posz', this.value)">
+                            </div>
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Vertical Position (Y-axis)</span>
+                                    <span id="posy-value">0.0px</span>
+                                </div>
+                                <input type="range" min="-120" max="120" step="3" value="0" class="config-slider" id="cal-posy" oninput="adjustSpectaclesCalibration('posy', this.value)">
+                            </div>
+                            <div class="slider-item">
+                                <div class="slider-labels">
+                                    <span>Tilt Angle (Rotation X)</span>
+                                    <span id="rotx-value">0°</span>
+                                </div>
+                                <input type="range" min="-30" max="30" step="2" value="0" class="config-slider" id="cal-rotx" oninput="adjustSpectaclesCalibration('rotx', this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="modal-action-box">
+                        <div class="purchase-info-row">
+                            <span class="total-label">Total Cost:</span>
+                            <span class="total-price" id="modal-price">$289.00</span>
+                        </div>
+                        <button class="btn btn-gradient btn-lg btn-full" onclick="addToCartAndCheckout()">
+                            <i class="fa-solid fa-cart-shopping"></i> Secure Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast-notification">
+        <i class="fa-solid fa-circle-check toast-icon"></i>
+        <div class="toast-body">
+            <h4 class="toast-title">Success</h4>
+            <p class="toast-message">Added to cart successfully!</p>
+        </div>
+    </div>
+
+    <!-- Interactive Footer -->
+    <footer>
+        <div class="container footer-container">
+            <div class="footer-left">
+                <a href="#" class="logo">
+                    <span class="logo-icon"><i class="fa-solid fa-eye-low-vision"></i></span>
+                    <span class="logo-text">LENSKY</span>
+                </a>
+                <p class="footer-tagline">Building Sustainable Wealth through Exquisite Vision.</p>
+                <p class="footer-copyright">&copy; 2026 Lensky PVT LTD. All rights reserved.</p>
+            </div>
+            
+            <div class="footer-links-group">
+                <div class="footer-col">
+                    <h4>Collections</h4>
+                    <a href="#collections">Aviator</a>
+                    <a href="#collections">Wayfarer</a>
+                    <a href="#collections">Round Vintage</a>
+                    <a href="#collections">Cat-Eye Chic</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Technology</h4>
+                    <a href="#technology">3D Rendering</a>
+                    <a href="#technology">Face Mesh AR</a>
+                    <a href="#technology">Physics Shaders</a>
+                    <a href="#technology">Privacy Policy</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <a href="mailto:support@lensky.com">support@lensky.com</a>
+                    <a href="tel:+18005550199">+1 (800) 555-0199</a>
+                    <a href="#">VR Support Center</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>
