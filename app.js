@@ -611,7 +611,7 @@ function initArStudio() {
             // Adjust coordinates based on webcam vs portrait setup
             const basePosY = arState.cameraActive ? 0.05 : 0.08; // Lowered from 0.45 to 0.08 to sit exactly on the face bridge
             const basePosZ = arState.cameraActive ? 1.2 : -1.1;  // Align glasses flush on the 3D portrait depth plane
-            const baseScale = arState.cameraActive ? 1.05 : 1.45; // Compensate for depth perspective scaling
+            const baseScale = arState.cameraActive ? 0.8 : 0.76;  // Scaled down from 1.45/1.05 to fit the face proportions snugly
             
             // Apply Calibration variables combined with dynamic interactive rotations
             arGlasses.scale.set(arState.scale * baseScale, arState.scale * baseScale, arState.scale * baseScale);
